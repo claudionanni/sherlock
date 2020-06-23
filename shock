@@ -10,58 +10,26 @@ import time
 import json
 from datetime import datetime
 
-print("\n\nSHERLOCK ©2020")
 
-timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
-path=timeExec
-try:
-    os.mkdir(path)
-except OSError:
-    print ("Creation of the directory %s failed" % path)
-else:
-    #print ("Successfully created the directory %s " % path)
-    os.chdir(path)
-
-cmd_type='none'
-cmd_to_exec=''
-if(len(sys.argv)==2):
-    cmd_to_exec=sys.argv[1]
-    cmd_type='linux'
-
-if(len(sys.argv)==6):
-    cmd_to_exec=sys.argv[1]
-    user=sys.argv[2]
-    pwd=sys.argv[3]
-    host=sys.argv[4]
-    port=sys.argv[5]
-    cmd_type='mdb'
-
-print("\nSyntax: shock <comma separated list of commands> [user password host port] # the optional parameters are needed for database type of commands\n")
-print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
-
-# Instantiate Connection
-try:
-   conn = mariadb.connect(
+def load_commands_from_db(cur):
+   try:
+      conn = mariadb.connect(
       user="sherlock",
       password="watson",
       host="127.0.0.1",
       database="sherlock",
       port=30318)
-except mariadb.Error as e:
-   print(f"Error connecting to MariaDB Platform: {e}")
-   sys.exit(1)
-
-cur = conn.cursor();
-
-
-
-def load_commands_from_db(cur):
+   except mariadb.Error as e:
+      print(f"Error connecting to MariaDB Platform: {e}")
+      sys.exit(1)
+   cur = conn.cursor();
    print("Loading commands...")
    cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
    for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
       listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
    with open('./sherlock_cmd.json', 'w') as fp:
       json.dump(listCommands, fp,indent=4)
+
 
 def load_commands_from_file():
    with open('../sherlock_cmd.json') as f:
@@ -122,10 +90,10 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
 
 def list_commands():
    print("\nList of available commands:")
-   print("-"*80)
-   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)")
-   for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
-      print(ID,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:20],"] \t\t\t--> ",DESCRIPTION)
+   mDict = {k: v for k, v in listCommands.items() if k.startswith('m')}
+   for k in mDict:
+       (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
+       print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:20],"] \t\t\t--> ",DESCRIPTION)
    print("la = all linux commands")
    print("ma = all mariadb commands")
    print("/ h = needs manual execution")
@@ -134,11 +102,58 @@ def list_commands():
 
 
 
+
+
+
+
+###
+###  MAIN SECTION - Executed at startup
+###
+
+
+print("\n\nSHERLOCK ©2020")
+
+timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
+path=timeExec
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    #print ("Successfully created the directory %s " % path)
+    os.chdir(path)
+
+cmd_type='none'
+cmd_to_exec=''
+if(len(sys.argv)==2):
+    cmd_to_exec=sys.argv[1]
+    cmd_type='linux'
+
+if(len(sys.argv)==6):
+    cmd_to_exec=sys.argv[1]
+    user=sys.argv[2]
+    pwd=sys.argv[3]
+    host=sys.argv[4]
+    port=sys.argv[5]
+    cmd_type='mdb'
+
+print("\nSyntax: shock <comma separated list of commands> [user password host port] # the optional parameters are needed for database type of commands\n")
+print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
+
+
+
+
 ### For easier manageability I keep a copy of the commands on the database and we load them every time from the table.
 ### Once the script is published the dictionary could be maintained in a separate text file that will be loaded each time or simply inside the python script
 
-listCommands={}
+# Use only to generate the json file and if db with commands is available
 #load_commands_from_db(cur)
+
+
+
+
+
+listCommands={}
 listCommands=load_commands_from_file()
 
 if(cmd_to_exec==''):
