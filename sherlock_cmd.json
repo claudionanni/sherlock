@@ -1,0 +1,62 @@
+{
+    "m1": [
+        "mdb",
+        "u",
+        "SHOW GLOBAL VARIABLES;",
+        "Global settings"
+    ],
+    "m2": [
+        "mdb",
+        "u",
+        "SHOW GLOBAL STATUS;",
+        "Status variables"
+    ],
+    "m3": [
+        "mdb",
+        "u",
+        "SELECT VERSION();",
+        "Database version"
+    ],
+    "m4": [
+        "mdb",
+        "u",
+        "SHOW ENGINE INNODB STATUS\\G",
+        "InnoDB engine status"
+    ],
+    "m5": [
+        "mdb",
+        "u",
+        "SHOW GLOBAL VARIABLES LIKE 'gtid%';",
+        "GTID Variables"
+    ],
+    "l1": [
+        "lin",
+        "u",
+        "df -h",
+        "Free disk space"
+    ],
+    "l2": [
+        "lin",
+        "u",
+        "ps -ef | egrep 'mysql|sst'",
+        "Processes"
+    ],
+    "l3": [
+        "lin",
+        "u",
+        "iostat -dx 1 -c 10",
+        "IO Stats"
+    ],
+    "l4": [
+        "lin",
+        "u",
+        "vmstat 1 10",
+        "VM Stats"
+    ],
+    "l5": [
+        "lin",
+        "h",
+        "gdb --batch -ex 'set height 0' -ex 'set print frame-arguments all' -ex 'thread apply all backtrace full' -ex 'print trx_sys->mutex' -ex 'print *trx_sys->mutex->m_impl->m_event' -ex 'print lock_sys->mutex' -ex 'print *lock_sys->mutex->m_impl->m_event' -ex 'print dict_sys->mutex' -ex 'print *dict_sys->mutex->m_impl->m_event' -ex 'print fil_system->mutex' -ex 'print *fil_system->mutex->m_impl->m_event' -ex 'print rw_lock_list_mutex' -ex 'print *rw_lock_list_mutex->m_impl->m_event' -ex 'print dict_operation_lock' $(path to mysqld) $(path to core dump) > gdb-output-$(date +%Y%m%d_%H%M%S).txt",
+        "GDB Core Dump stack"
+    ]
+}

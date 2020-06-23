@@ -1,0 +1,155 @@
+#!/usr/bin/python3
+
+#SHERLOCK © 2020 - Claudio Nanni
+
+# Module Imports
+import mariadb
+import sys
+import os
+import time
+import json
+from datetime import datetime
+
+print("\n\nSHERLOCK ©2020")
+
+timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
+path=timeExec
+try:
+    os.mkdir(path)
+except OSError:
+    print ("Creation of the directory %s failed" % path)
+else:
+    #print ("Successfully created the directory %s " % path)
+    os.chdir(path)
+
+cmd_type='none'
+cmd_to_exec=''
+if(len(sys.argv)==2):
+    cmd_to_exec=sys.argv[1]
+    cmd_type='linux'
+
+if(len(sys.argv)==6):
+    cmd_to_exec=sys.argv[1]
+    user=sys.argv[2]
+    pwd=sys.argv[3]
+    host=sys.argv[4]
+    port=sys.argv[5]
+    cmd_type='mdb'
+
+print("\nSyntax: shock <comma separated list of commands> [user password host port] # the optional parameters are needed for database type of commands\n")
+print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
+
+# Instantiate Connection
+try:
+   conn = mariadb.connect(
+      user="sherlock",
+      password="watson",
+      host="127.0.0.1",
+      database="sherlock",
+      port=30318)
+except mariadb.Error as e:
+   print(f"Error connecting to MariaDB Platform: {e}")
+   sys.exit(1)
+
+cur = conn.cursor();
+
+
+
+def load_commands_from_db(cur):
+   print("Loading commands...")
+   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
+   for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
+      listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
+   with open('./sherlock_cmd.json', 'w') as fp:
+      json.dump(listCommands, fp,indent=4)
+
+def load_commands_from_file():
+   with open('../sherlock_cmd.json') as f:
+      Commands = json.load(f)
+   return Commands
+
+
+## Add management for 'la' a=all linux commands
+def exec_commands(cmdNum,lstCmds):
+   print("\n")
+   if(cmdNum=='la'):
+      lDict = {k: v for k, v in lstCmds.items() if k.startswith('l')}
+      for k in lDict:
+         (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
+         output_file=TYPE+"_"+str(k)+"-"+timeExec+".shock"
+         full_command=COMMAND + " > " + output_file
+         print(str(k),":: ",full_command,"\t\t\t (",DESCRIPTION,")")
+         if(USER_TYPE!='h'):
+            os.system(full_command)
+         else:
+             print("\nNOTE: Command needs manual execution!")
+   else:    
+      (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
+      output_file=TYPE+"_"+str(cmdNum)+"-"+timeExec+".shock"
+      full_command=COMMAND + " > " + output_file
+      print(cmdNum,":: ",full_command,"\t\t\t (",DESCRIPTION,")")
+      if(USER_TYPE!='h'):
+         os.system(full_command)
+      else:
+         print("\nNOTE: Command needs manual execution!")
+
+
+## Add management for 'ma' a=all mdb commands
+def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
+   if(cmdNum=='ma'):
+       mDict = {k: v for k, v in lstCmds.items() if k.startswith('m')}
+       for k in mDict:    
+            (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
+            output_file=TYPE+"_"+str(k)+"-"+timeExec+".shock"
+            full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+            print(full_command+" > "+output_file)
+            if(USER_TYPE!='h'):
+               os.system(full_command + " > " + output_file)
+            else:
+               print("Command needs manual execution")
+
+               
+   else:
+       (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
+       output_file=TYPE+"_"+str(cmdNum)+"-"+timeExec+".shock"
+       full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+       print(full_command+" > "+output_file)
+       if(USER_TYPE!='h'):
+          os.system(full_command + " > " + output_file)
+       else:
+          print("Command needs manual execution")
+
+
+def list_commands():
+   print("\nList of available commands:")
+   print("-"*80)
+   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)")
+   for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
+      print(ID,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:20],"] \t\t\t--> ",DESCRIPTION)
+   print("la = all linux commands")
+   print("ma = all mariadb commands")
+   print("/ h = needs manual execution")
+   print("-"*80)
+
+
+
+
+### For easier manageability I keep a copy of the commands on the database and we load them every time from the table.
+### Once the script is published the dictionary could be maintained in a separate text file that will be loaded each time or simply inside the python script
+
+listCommands={}
+#load_commands_from_db(cur)
+listCommands=load_commands_from_file()
+
+if(cmd_to_exec==''):
+    list_commands()
+else:
+    cmdList=cmd_to_exec.split(",")
+    #print(cmdList)
+    for i in cmdList:
+        if(i[0:1]=='l'):
+           exec_commands(i,listCommands)
+        if(i[0:1]=='m' and cmd_type=='mdb'):
+           exec_mariadb(i,listCommands,user,pwd,host,port)
+
+print("\nExiting...\n")
