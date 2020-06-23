@@ -1,0 +1,8 @@
+CREATE TABLE `sherlock_cmd` (
+  `ID` varchar(8) NOT NULL,
+  `TYPE` char(3) DEFAULT NULL,
+  `USER_TYPE` char(3) DEFAULT NULL,
+  `COMMAND` varchar(4096) DEFAULT NULL,
+  `DESCRIPTION` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
