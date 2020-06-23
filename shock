@@ -12,6 +12,7 @@ from datetime import datetime
 
 
 def load_commands_from_db(cur):
+   # For database management of commands, periodically they can be exported from the database (if mantained there) and dumped to json file that should be then uploaded to github
    try:
       conn = mariadb.connect(
       user="sherlock",
@@ -90,7 +91,7 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
 
 def list_commands():
    print("\nList of available commands:")
-   mDict = {k: v for k, v in listCommands.items() if k.startswith('m')}
+   mDict = {k: v for k, v in listCommands.items() if k.startswith('m') or k.startswith('l')}
    for k in mDict:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
        print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:20],"] \t\t\t--> ",DESCRIPTION)
