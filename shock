@@ -8,6 +8,7 @@ import sys
 import os
 import time
 import json
+import requests
 from datetime import datetime
 
 
@@ -32,10 +33,22 @@ def load_commands_from_db(cur):
       json.dump(listCommands, fp,indent=4)
 
 
+def download_commands_from_url():
+    try:
+       url = 'https://raw.githubusercontent.com/claudionanni/sherlock/master/sherlock_cmd.json'
+       r = requests.get(url, allow_redirects=False)
+       open('../sherlock_cmd.json', 'wb').write(r.content)
+    except:
+       print("Commands file could not be downloaded from the internet, will try to use the local copy.")
+
 def load_commands_from_file():
-   with open('../sherlock_cmd.json') as f:
-      Commands = json.load(f)
-   return Commands
+    try:
+        with open('../sherlock_cmd.json') as f:
+            Commands = json.load(f)
+            return Commands
+    except:
+        print("Could not load local commands file, we can't proceed.")
+        exit()
 
 
 ## Add management for 'la' a=all linux commands
@@ -60,7 +73,7 @@ def exec_commands(cmdNum,lstCmds):
       if(USER_TYPE!='h'):
          os.system(full_command)
       else:
-         print("\nNOTE: Command needs manual execution!")
+          print("\nNOTE: ",str(cmdNum), ":: command needs manual execution!")
 
 
 ## Add management for 'ma' a=all mdb commands
@@ -75,7 +88,7 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
             if(USER_TYPE!='h'):
                os.system(full_command + " > " + output_file)
             else:
-               print("Command needs manual execution")
+                print("\nNOTE:",str(k),":: command needs manual execution")
 
                
    else:
@@ -153,7 +166,7 @@ print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
 
 
 
-
+download_commands_from_url()
 listCommands={}
 listCommands=load_commands_from_file()
 
