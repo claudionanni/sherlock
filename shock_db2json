@@ -31,6 +31,7 @@ def dump_commands_from_db():
    cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
    for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
       listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
+   print("Writing commands to json file...")
    with open('./sherlock_cmd.json', 'w') as fp:
       json.dump(listCommands, fp,indent=4)
 

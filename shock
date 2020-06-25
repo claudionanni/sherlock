@@ -128,7 +128,7 @@ def list_commands():
 print("\n\nSHERLOCK ©2020")
 
 timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
-path=timeExec
+path="shock-" + timeExec
 try:
     os.mkdir(path)
 except OSError:
