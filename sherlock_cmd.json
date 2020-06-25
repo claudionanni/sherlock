@@ -57,6 +57,66 @@
         "lin",
         "h",
         "gdb --batch -ex 'set height 0' -ex 'set print frame-arguments all' -ex 'thread apply all backtrace full' -ex 'print trx_sys->mutex' -ex 'print *trx_sys->mutex->m_impl->m_event' -ex 'print lock_sys->mutex' -ex 'print *lock_sys->mutex->m_impl->m_event' -ex 'print dict_sys->mutex' -ex 'print *dict_sys->mutex->m_impl->m_event' -ex 'print fil_system->mutex' -ex 'print *fil_system->mutex->m_impl->m_event' -ex 'print rw_lock_list_mutex' -ex 'print *rw_lock_list_mutex->m_impl->m_event' -ex 'print dict_operation_lock' $(path to mysqld) $(path to core dump) > gdb-output-$(date +%Y%m%d_%H%M%S).txt",
-        "GDB threads"
+        "GDB Core Dump stack"
+    ],
+    "l6": [
+        "lin",
+        "u",
+        "cat /etc/fstab",
+        "fstab configuration"
+    ],
+    "l7": [
+        "lin",
+        "u",
+        "top -b -n 1",
+        "Server Processes with resource usage"
+    ],
+    "l8": [
+        "lin",
+        "u",
+        "cat /proc/version; cat /etc/issue; cat /etc/redhat-release",
+        "Linux Distro Version"
+    ],
+    "l9": [
+        "lin",
+        "u",
+        "cat /proc/meminfo",
+        "Memory info"
+    ],
+    "l10": [
+        "lin",
+        "u",
+        "cat /proc/cpuinfo",
+        "CPU info"
+    ],
+    "l11": [
+        "lin",
+        "u",
+        "cat /proc/mounts",
+        "Server mounts"
+    ],
+    "l12": [
+        "lin",
+        "u",
+        "ifconfig -a",
+        "Server network cards"
+    ],
+    "l13": [
+        "lin",
+        "u",
+        "ipcs -l",
+        "Shared memory"
+    ],
+    "l14": [
+        "lin",
+        "u",
+        "df -h",
+        "Disk usage"
+    ],
+    "l15": [
+        "lin",
+        "u",
+        "ps -ef | egrep -i \"maria|mysql|galera|percona|sst\"",
+        "Check relevant processes"
     ]
 }
