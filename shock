@@ -16,8 +16,8 @@ from string import digits
 def download_commands_from_url():
     try:
        url = 'https://raw.githubusercontent.com/claudionanni/sherlock/master/sherlock_cmd.json'
-       r = requests.get(url, allow_redirects=False)
-       open('../sherlock_cmd.json', 'wb').write(r.content)
+       r = requests.get(url, allow_redirects=True)
+       open('./sherlock_cmd.json', 'wb').write(r.content)
     except:
        print("Commands file could not be downloaded from the internet, will try to use the local copy.")
 
