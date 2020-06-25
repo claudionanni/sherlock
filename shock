@@ -12,27 +12,6 @@ import requests
 from datetime import datetime
 
 
-def load_commands_from_db(cur):
-   # For database management of commands, periodically they can be exported from the database (if mantained there) and dumped to json file that should be then uploaded to github
-   try:
-      conn = mariadb.connect(
-      user="sherlock",
-      password="watson",
-      host="127.0.0.1",
-      database="sherlock",
-      port=30318)
-   except mariadb.Error as e:
-      print(f"Error connecting to MariaDB Platform: {e}")
-      sys.exit(1)
-   cur = conn.cursor();
-   print("Loading commands...")
-   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
-   for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
-      listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
-   with open('./sherlock_cmd.json', 'w') as fp:
-      json.dump(listCommands, fp,indent=4)
-
-
 def download_commands_from_url():
     try:
        url = 'https://raw.githubusercontent.com/claudionanni/sherlock/master/sherlock_cmd.json'
@@ -114,16 +93,9 @@ def list_commands():
    print("-"*80)
 
 
-
-
-
-
-
-
 ###
 ###  MAIN SECTION - Executed at startup
 ###
-
 
 print("\n\nSHERLOCK ©2020")
 
@@ -153,18 +125,6 @@ if(len(sys.argv)==6):
 
 print("\nSyntax: shock <comma separated list of commands> [user password host port] # the optional parameters are needed for database type of commands\n")
 print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
-
-
-
-
-### For easier manageability I keep a copy of the commands on the database and we load them every time from the table.
-### Once the script is published the dictionary could be maintained in a separate text file that will be loaded each time or simply inside the python script
-
-# Use only to generate the json file and if db with commands is available
-#load_commands_from_db(cur)
-
-
-
 
 download_commands_from_url()
 listCommands={}
