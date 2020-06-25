@@ -86,7 +86,7 @@ def list_commands():
    mDict = {k: v for k, v in listCommands.items() if k.startswith('m') or k.startswith('l')}
    for k in mDict:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
-       print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:20],"] \t\t\t--> ",DESCRIPTION)
+       print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:25].ljust(25),"] \t\t--> ",DESCRIPTION)
    print("la = all linux commands")
    print("ma = all mariadb commands")
    print("/ h = needs manual execution")
@@ -99,15 +99,17 @@ def list_commands():
 
 print("\n\nSHERLOCK ©2020")
 
-timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
-path="shock-" + timeExec
-try:
-    os.mkdir(path)
-except OSError:
-    print ("Creation of the directory %s failed" % path)
-else:
-    #print ("Successfully created the directory %s " % path)
-    os.chdir(path)
+
+def createTimestampedFolder():
+    timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
+    path="shock-" + timeExec
+    try:
+        os.mkdir(path)
+    except OSError:
+        print ("Creation of the directory %s failed" % path)
+    else:
+        #print ("Successfully created the directory %s " % path)
+        os.chdir(path)
 
 cmd_type='none'
 cmd_to_exec=''
@@ -133,6 +135,7 @@ listCommands=load_commands_from_file()
 if(cmd_to_exec==''):
     list_commands()
 else:
+    createTimestampedFolder()
     cmdList=cmd_to_exec.split(",")
     #print(cmdList)
     for i in cmdList:
