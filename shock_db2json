@@ -12,17 +12,19 @@ import requests
 from datetime import datetime
 
 
+
+
 def dump_commands_from_db():
    # For database management of commands, periodically they can be exported from the database (if mantained there) and dumped to json file that should be then uploaded to github
    listCommands={}
 
    try:
       conn = mariadb.connect(
-      user="sherlock",
-      password="watson",
-      host="127.0.0.1",
+      user=par1,
+      password=par2,
+      host=par3,
       database="sherlock",
-      port=30318)
+      port=par4)
    except mariadb.Error as e:
       print(f"Error connecting to MariaDB Platform: {e}")
       sys.exit(1)
@@ -34,5 +36,10 @@ def dump_commands_from_db():
    print("Writing commands to json file...")
    with open('./sherlock_cmd.json', 'w') as fp:
       json.dump(listCommands, fp,indent=4)
+
+par1=str(sys.argv[1])
+par2=str(sys.argv[2])
+par3=str(sys.argv[3])
+par4=int(sys.argv[4])
 
 dump_commands_from_db()
