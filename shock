@@ -10,6 +10,7 @@ import time
 import json
 import requests
 from datetime import datetime
+from string import digits
 
 
 def download_commands_from_url():
@@ -37,7 +38,7 @@ def exec_commands(cmdNum,lstCmds):
       lDict = {k: v for k, v in lstCmds.items() if k.startswith('l')}
       for k in lDict:
          (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
-         output_file=TYPE+"_"+str(k)+"-"+timeExec+".shock"
+         output_file=str(k)+".shock"
          full_command=COMMAND + " > " + output_file
          print(str(k),":: ",full_command,"\t\t\t (",DESCRIPTION,")")
          if(USER_TYPE!='h'):
@@ -46,7 +47,7 @@ def exec_commands(cmdNum,lstCmds):
              print("\nNOTE: Command needs manual execution!")
    else:    
       (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
-      output_file=TYPE+"_"+str(cmdNum)+"-"+timeExec+".shock"
+      output_file=str(cmdNum)+".shock"
       full_command=COMMAND + " > " + output_file
       print(cmdNum,":: ",full_command,"\t\t\t (",DESCRIPTION,")")
       if(USER_TYPE!='h'):
@@ -61,7 +62,7 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
        mDict = {k: v for k, v in lstCmds.items() if k.startswith('m')}
        for k in mDict:    
             (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
-            output_file=TYPE+"_"+str(k)+"-"+timeExec+".shock"
+            output_file=str(k)+".shock"
             full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
             print(full_command+" > "+output_file)
             if(USER_TYPE!='h'):
@@ -72,7 +73,7 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
                
    else:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
-       output_file=TYPE+"_"+str(cmdNum)+"-"+timeExec+".shock"
+       output_file=str(cmdNum)+".shock"
        full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
        print(full_command+" > "+output_file)
        if(USER_TYPE!='h'):
@@ -83,6 +84,7 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
 
 def list_commands():
    print("\nList of available commands:")
+   ### HERE There is some censorship on the prefix of possible commands, decide what to do
    mDict = {k: v for k, v in listCommands.items() if k.startswith('m') or k.startswith('l')}
    for k in mDict:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
@@ -99,10 +101,11 @@ def list_commands():
 
 print("\n\nSHERLOCK ©2020")
 
-
+timestampedFolder=''
 def createTimestampedFolder():
-    timeExec=datetime.now().strftime("%Y%m%d-%H%M%S")
-    path="shock-" + timeExec
+    timestampedFolder=datetime.now().strftime("%Y%m%d-%H%M%S")
+    path="shock-" + timestampedFolder
+    print("All collected data will be placed in the folder: ",path,"\n")
     try:
         os.mkdir(path)
     except OSError:
@@ -139,9 +142,11 @@ else:
     cmdList=cmd_to_exec.split(",")
     #print(cmdList)
     for i in cmdList:
-        if(i[0:1]=='l'):
+        removeDigits = str.maketrans('', '', digits)
+        iSin=i.translate(removeDigits)
+        if(iSin=='l'):
            exec_commands(i,listCommands)
-        if(i[0:1]=='m' and cmd_type=='mdb'):
+        if(iSin=='m' and cmd_type=='mdb'):
            exec_mariadb(i,listCommands,user,pwd,host,port)
 
 print("\nExiting...\n")
