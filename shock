@@ -92,7 +92,7 @@ def list_commands():
        print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:25].ljust(25),"] \t\t--> ",DESCRIPTION)
    print("la = all linux commands")
    print("ma = all mariadb commands")
-   print("/ h = needs manual execution")
+   print("/ h = needs manual edit for execution")
    print("-"*80)
 
 
