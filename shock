@@ -11,6 +11,7 @@ import json
 import requests
 from datetime import datetime
 from string import digits
+import argparse
 
 
 def download_commands_from_url():
@@ -23,7 +24,7 @@ def download_commands_from_url():
 
 def load_commands_from_file():
     try:
-        with open('../sherlock_cmd.json') as f:
+        with open('./sherlock_cmd.json') as f:
             Commands = json.load(f)
             return Commands
     except:
@@ -101,6 +102,20 @@ def list_commands():
 
 print("\n\nSHERLOCK ©2020")
 
+parser = argparse.ArgumentParser(prog='shock',description='Collects info from the OS and a MariaDB instance for incident investigation.')
+#parser.add_argument('integers', metavar='N', type=int, nargs='+',help='an integer for the accumulator')
+#parser.add_argument('--sum', dest='accumulate', action='store_const',const=sum, default=max,help='sum the integers (default: find the max)')
+parser.add_argument('--host', metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
+parser.add_argument('--port', metavar='<port>',default='3306',help='Port the MariaDB instance')
+parser.add_argument('--user', metavar='<user>',default='root',help='User of the MariaDB instance')
+parser.add_argument('--password', metavar='<password>',default='',help='Password of the MariaDB instance')
+parser.add_argument('--commands', metavar='<command>,',nargs='*',help='It takes a comma separated list of commands')
+args = parser.parse_args()
+#print(args)
+#parser.parse_args(['--commands'])
+#print(print(args.commands))
+
+
 timestampedFolder=''
 def createTimestampedFolder():
     timestampedFolder=datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -114,39 +129,22 @@ def createTimestampedFolder():
         #print ("Successfully created the directory %s " % path)
         os.chdir(path)
 
-cmd_type='none'
-cmd_to_exec=''
-if(len(sys.argv)==2):
-    cmd_to_exec=sys.argv[1]
-    cmd_type='linux'
 
-if(len(sys.argv)==6):
-    cmd_to_exec=sys.argv[1]
-    user=sys.argv[2]
-    pwd=sys.argv[3]
-    host=sys.argv[4]
-    port=sys.argv[5]
-    cmd_type='mdb'
-
-print("\nSyntax: shock <comma separated list of commands> [user password host port] # the optional parameters are needed for database type of commands\n")
-print("\nExample: shock m1,m2,l1 joe secret 192.168.0.22 4040\n")
 
 download_commands_from_url()
 listCommands={}
 listCommands=load_commands_from_file()
 
-if(cmd_to_exec==''):
+if(args.commands==None):
     list_commands()
 else:
     createTimestampedFolder()
-    cmdList=cmd_to_exec.split(",")
-    #print(cmdList)
+    cmdList=args.commands[0].split(',')
     for i in cmdList:
-        removeDigits = str.maketrans('', '', digits)
-        iSin=i.translate(removeDigits)
+        iSin=i[:1]
         if(iSin=='l'):
            exec_commands(i,listCommands)
-        if(iSin=='m' and cmd_type=='mdb'):
-           exec_mariadb(i,listCommands,user,pwd,host,port)
+        if(iSin=='m'):
+           exec_mariadb(i,listCommands,args.user,args.password,args.host,args.port)
 
 print("\nExiting...\n")
