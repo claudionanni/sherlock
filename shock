@@ -123,6 +123,7 @@ def list_commands():
 print("\n\nSHERLOCK ©2020 By Claudio The Nanni")
 
 parser = argparse.ArgumentParser(prog='shock',description='Collects info from the OS and a MariaDB instance for incident investigation.')
+parser.add_argument("-l","--list", action="store_true",help="Provides the list of available commands from the remote or local json file")
 parser.add_argument("-H","--host", metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
 parser.add_argument("-P","--port", metavar='<port>',default='3306',help='Port the MariaDB instance')
 parser.add_argument("-u","--user", metavar='<user>',default='root',help='User of the MariaDB instance')
@@ -151,9 +152,13 @@ download_commands_from_url()
 listCommands={}
 listCommands=load_commands_from_file()
 
-if(args.commands==None):
+if len(sys.argv)==1:
+    parser.print_help()
+
+if(args.list):
     list_commands()
-else:
+
+if(args.commands):
     createTimestampedFolder()
     cmdList=args.commands[0].split(',')
     for i in cmdList:
