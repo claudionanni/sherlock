@@ -103,15 +103,17 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
 
 def list_commands():
    print("\nList of available commands:")
+   print("_"*120)
    ### HERE There is some censorship on the prefix of possible commands, decide what to do
    mDict = {k: v for k, v in listCommands.items() if k.startswith('m') or k.startswith('l')}
    for k in mDict:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
        print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:25].ljust(25),"] \t\t--> ",DESCRIPTION)
+   print("¨"*120)
    print("la = all linux commands")
    print("ma = all mariadb commands")
    print("/ h = needs manual edit for execution")
-   print("-"*120)
+   print("¨"*120)
 
 
 ###
