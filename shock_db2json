@@ -10,7 +10,16 @@ import time
 import json
 import requests
 from datetime import datetime
+import argparse
 
+print("\n\nSHERLOCK - Command Dumper ©2020 By Claudio The Nanni")
+
+parser = argparse.ArgumentParser(prog='shock',description='Dumps SHERLOCK commands from DB to JSON')
+parser.add_argument('--host', metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
+parser.add_argument('--port', metavar='<port>',default='3306',help='Port the MariaDB instance')
+parser.add_argument('--user', metavar='<user>',default='root',help='User of the MariaDB instance')
+parser.add_argument('--password', metavar='<password>',default='',help='Password of the MariaDB instance')
+args = parser.parse_args()
 
 
 
@@ -20,11 +29,11 @@ def dump_commands_from_db():
 
    try:
       conn = mariadb.connect(
-      user=par1,
-      password=par2,
-      host=par3,
+      user=args.user,
+      password=args.password,
+      host=args.host,
       database="sherlock",
-      port=par4)
+      port=int(args.port))
    except mariadb.Error as e:
       print(f"Error connecting to MariaDB Platform: {e}")
       sys.exit(1)
@@ -36,10 +45,5 @@ def dump_commands_from_db():
    print("Writing commands to json file...")
    with open('./sherlock_cmd.json', 'w') as fp:
       json.dump(listCommands, fp,indent=4)
-
-par1=str(sys.argv[1])
-par2=str(sys.argv[2])
-par3=str(sys.argv[3])
-par4=int(sys.argv[4])
 
 dump_commands_from_db()
