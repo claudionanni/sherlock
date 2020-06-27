@@ -41,26 +41,28 @@ def exec_commands(cmdNum,lstCmds):
          (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
          output_file=str(k)+".shock"
          full_command=COMMAND + " > " + output_file
+         print("_"*120)
          print("\n",str(k),":: ",full_command,"\t\t\t (",DESCRIPTION,")")
          if(USER_TYPE!='h'):
             os.system(full_command)
             if(args.verbose):
                 print("_"*120)
                 os.system('cat ' + output_file)
-                print("-"*120)
+                print("¨"*120)
          else:
              print("\nNOTE: Command needs manual execution!")
    else:    
       (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
       output_file=str(cmdNum)+".shock"
       full_command=COMMAND + " > " + output_file
+      print("_"*120)
       print("\n",cmdNum,":: ",full_command,"\t\t\t (",DESCRIPTION,")")
       if(USER_TYPE!='h'):
          os.system(full_command)
          if(args.verbose):
              print("_"*120)
              os.system('cat ' + output_file)
-             print("-"*120)
+             print("¨"*120)
       else:
           print("\nNOTE: ",str(cmdNum), ":: command needs manual execution!")
 
@@ -73,26 +75,28 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
             (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
             output_file=str(k)+".shock"
             full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+            print("_"*120)
             print(full_command+" > "+output_file)
             if(USER_TYPE!='h'):
                 os.system(full_command + " > " + output_file)
                 if(args.verbose):
                     print("_"*120)
                     os.system('cat ' + output_file)
-                    print("-"*120)
+                    print("¨"*120)
             else:
                 print("\nNOTE:",str(k),":: command needs manual execution")
    else:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
        output_file=str(cmdNum)+".shock"
        full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+       print("_"*120)
        print(full_command+" > "+output_file)
        if(USER_TYPE!='h'):
             os.system(full_command + " > " + output_file)
             if(args.verbose):
                 print("_"*120)
                 os.system('cat ' + output_file)
-                print("-"*120)
+                print("¨"*120)
        else:
             print("Command needs manual execution")
 
