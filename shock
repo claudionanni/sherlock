@@ -137,7 +137,7 @@ timestampedFolder=''
 def createTimestampedFolder():
     timestampedFolder=datetime.now().strftime("%Y%m%d-%H%M%S")
     path="shock-" + timestampedFolder
-    print("All collected data will be placed in the folder: ",path,"\n")
+    print("\nAll collected data will be placed in the folder: ",path,"\n")
     try:
         os.mkdir(path)
     except OSError:
