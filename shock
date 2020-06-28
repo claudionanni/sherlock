@@ -102,16 +102,19 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
 
 
 def list_commands():
-   print("\nList of available commands:")
+   print("\nList of available commands:\n")
+   print("cmdid","\t: (type/user)\t[          command          ]\t\t--> description")
    print("_"*120)
    ### HERE There is some censorship on the prefix of possible commands, decide what to do
    mDict = {k: v for k, v in listCommands.items() if k.startswith('m') or k.startswith('l')}
    for k in mDict:
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=listCommands[k]
-       print(k,"\t: (",TYPE,"/",USER_TYPE,") [",COMMAND[:25].ljust(25),"] \t\t--> ",DESCRIPTION)
+       print(k,"\t: (",TYPE,"/",USER_TYPE,")\t[",COMMAND[:25].ljust(25),"]\t\t--> ",DESCRIPTION)
    print("¨"*120)
-   print("la = all linux commands")
-   print("ma = all mariadb commands")
+   for li in prefixCommands:
+       print(li,": runs all commands that start with '",li,"'")
+   print("/ u = executed by non administrative user")
+   print("/ s = needs execution by administrative user")
    print("/ h = needs manual edit for execution")
    print("¨"*120)
 
@@ -151,6 +154,8 @@ def createTimestampedFolder():
 download_commands_from_url()
 listCommands={}
 listCommands=load_commands_from_file()
+prefixCommands=set([item[:1] for item in listCommands])
+print(prefixCommands)
 
 if len(sys.argv)==1:
     parser.print_help()
