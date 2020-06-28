@@ -40,27 +40,37 @@ def exec_commands(cmdNum,lstCmds):
       for k in lDict:
          (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
          output_file=str(k)+".shock"
-         full_command=COMMAND + " > " + output_file
+         if(args.screen):
+             toDisk=''
+         else:
+             toDisk=" > " + output_file
+         full_command=COMMAND + toDisk
          print("_"*120)
          print("\n",str(k),":: ",full_command,"\t\t\t (",DESCRIPTION,")")
          if(USER_TYPE!='h'):
-            os.system(full_command)
-            if(args.verbose):
-                print("_"*120)
-                os.system('cat ' + output_file)
-                print("¨"*120)
+             print("_"*120)
+             os.system(full_command)
+             print("_"*120)
+             if(0==1):
+                 os.system('cat ' + output_file)
+                 print("¨"*120)
          else:
              print("\nNOTE: Command needs manual execution!")
    else:    
       (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
       output_file=str(cmdNum)+".shock"
-      full_command=COMMAND + " > " + output_file
+      if(args.screen):
+          toDisk=''
+      else:
+          toDisk=" > " + output_file
+      full_command=COMMAND + toDisk
       print("_"*120)
       print("\n",cmdNum,":: ",full_command,"\t\t\t (",DESCRIPTION,")")
       if(USER_TYPE!='h'):
+         print("_"*120)
          os.system(full_command)
-         if(args.verbose):
-             print("_"*120)
+         print("_"*120)
+         if(0==1):
              os.system('cat ' + output_file)
              print("¨"*120)
       else:
@@ -75,12 +85,18 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
             (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[k]
             output_file=str(k)+".shock"
             full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+            if(args.screen):
+                toDisk=''
+            else:
+                toDisk=" > " + output_file
+            full_command=full_command + toDisk
             print("_"*120)
-            print(full_command+" > "+output_file)
+            print(full_command)
             if(USER_TYPE!='h'):
-                os.system(full_command + " > " + output_file)
-                if(args.verbose):
-                    print("_"*120)
+                print("_"*120)
+                os.system(full_command)
+                print("_"*120)
+                if(0==1):
                     os.system('cat ' + output_file)
                     print("¨"*120)
             else:
@@ -89,12 +105,18 @@ def exec_mariadb(cmdNum,lstCmds,user='-',pwd='-',host='-',port='-'):
        (TYPE,USER_TYPE,COMMAND,DESCRIPTION)=lstCmds[cmdNum]
        output_file=str(cmdNum)+".shock"
        full_command="mysql -u"+user+" -p"+pwd+" -h"+host+" -P"+port+" -e \""+COMMAND+"\""
+       if(args.screen):
+           toDisk=''
+       else:
+           toDisk=" > " + output_file
+       full_command=full_command + toDisk
        print("_"*120)
-       print(full_command+" > "+output_file)
+       print(full_command)
        if(USER_TYPE!='h'):
-            os.system(full_command + " > " + output_file)
-            if(args.verbose):
-                print("_"*120)
+            print("_"*120)
+            os.system(full_command)
+            print("_"*120)
+            if(0==1):
                 os.system('cat ' + output_file)
                 print("¨"*120)
        else:
@@ -132,7 +154,8 @@ parser.add_argument("-P","--port", metavar='<port>',default='3306',help='Port th
 parser.add_argument("-u","--user", metavar='<user>',default='root',help='User of the MariaDB instance')
 parser.add_argument("-p","--password", metavar='<password>',default='',help='Password of the MariaDB instance')
 parser.add_argument("-c","--commands", metavar='<command>,',nargs='*',help='It takes a comma separated list of commands')
-parser.add_argument("-v","--verbose",action="store_true",help='Also prints the commands output on screen')
+#parser.add_argument("-v","--verbose",action="store_true",help='Also prints the commands output on screen')
+parser.add_argument("-s","--screen",action="store_true",help='Show ouput of commands on screen, do not write to files')
 args = parser.parse_args()
 
 
