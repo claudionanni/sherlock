@@ -34,12 +34,17 @@ def retrieve_file_paths(dirName):
   return filePaths
 
 def get_token_and_session():
+    s = requests.Session()
     url= 'https://filerequestpro.com/up/mariadb-support'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+    getResponse = s.get(url)
+    print(s)
+    print(s.cookies.get_dict())
+    #print(getResponse.text)
+    print("END OF GET")
+    soup = BeautifulSoup(getResponse.text, "html.parser")
     u_token = soup.find('input', {'name': '_token'}).get('value')
     u_session = soup.find('input', {'name': 'upload_session'}).get('value')
-    return([u_token,u_session])
+    return([u_token,u_session,s])
 
 def download_commands_from_url():
     try:
@@ -161,10 +166,10 @@ def list_commands():
        print(k,"\t: (",TYPE,"/",USER_TYPE,")\t[",COMMAND[:25].ljust(25),"]\t\t--> ",DESCRIPTION)
    print("¨"*120)
    for li in prefixCommands:
-       print(li,": runs all commands that start with '",li,"'")
+       print(li+"a: runs all commands that start with '",li,"'")
    print("/ u = executed by non administrative user")
    print("/ s = needs execution by administrative user")
-   print("/ h = needs manual edit for execution")
+   print("/ h = needs manual edit and execution")
    print("¨"*120)
 
 
@@ -189,7 +194,7 @@ timestampedFolder=''
 def createTimestampedFolder():
     timestampedFolder=datetime.now().strftime("%Y%m%d-%H%M%S")
     path="shock-" + timestampedFolder
-    print("\nAll collected data will be placed in the folder: ",path,"\n")
+    print("\nAll collected data will be placed in the folder: ",path," and zipped to ",path+".zip\n")
     try:
         os.mkdir(path)
     except OSError:
@@ -212,9 +217,10 @@ if(args.list):
     list_commands()
 
 if(args.commands):
-    timestampedFolder=createTimestampedFolder()
-    zippedFolder=timestampedFolder + '.zip'
-    os.chdir(timestampedFolder)
+    if(not args.screen):
+        timestampedFolder=createTimestampedFolder()
+        zippedFolder=timestampedFolder + '.zip'
+        os.chdir(timestampedFolder)
     cmdList=args.commands[0].split(',')
     for i in cmdList:
         iSin=i[:1]
@@ -222,7 +228,7 @@ if(args.commands):
            exec_commands(i,listCommands)
         if(iSin=='m'):
            exec_mariadb(i,listCommands,args.user,args.password,args.host,args.port)
-    if(1==1):
+    if(not args.screen):
         dir_name = '../' + timestampedFolder
         filePaths = retrieve_file_paths(dir_name)
         #for fileName in filePaths:
@@ -231,21 +237,25 @@ if(args.commands):
         with zip_file:
             for file in filePaths:
                 zip_file.write(file)
-    if(1==1):
-        f__token, f_upload_session=get_token_and_session()
+    if(1==0):
+        f__token, f_upload_session,mySession=get_token_and_session()
         f_user_id=621
         f_page_id=614
         f_filename=zippedFolder
         f_uuid=112299
         f_totalchunks=1
         f_action='https://filerequestpro.com/process-uploads'
-        
+#<form id="frp" enctype="multipart/form-data" action="https://filerequestpro.com/upload">        
         ### Two cookies needs to be set
-
+        headers = {'User-Agent': 'Mozilla/5.0'}
         data = {'_token':f__token,'upload_session':f_upload_session,'user_id':f_user_id,'page_id':f_page_id,'filename':f_filename,'uuid':f_uuid,'totalchunks':f_totalchunks}
-        ## Will tell now 'Session Expired'
-        #r = requests.post(url = f_action, data = data)
+        ## Will tell now 'Session Expired'o
+        #print("POST STARTS HERE")
+        #print(mySession.cookies.get_dict())
+        #postResponse=mySession.post(url = f_action, headers=headers,files = data)
+        #print(postResponse.status_code)
+        #soup = BeautifulSoup(postResponse.text, "html.parser")
+        #print(soup)
         
-        #print(r.text)
 
 print("\nExiting...\n")
