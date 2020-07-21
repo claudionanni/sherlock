@@ -29,6 +29,12 @@
         "SHOW GLOBAL VARIABLES LIKE 'gtid%';",
         "GTID Variables"
     ],
+    "m6": [
+        "mdb",
+        "u",
+        "SELECT NOW();",
+        "tell me the time"
+    ],
     "l1": [
         "lin",
         "u",
