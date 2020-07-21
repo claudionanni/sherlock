@@ -29,6 +29,12 @@
         "SHOW GLOBAL VARIABLES LIKE 'gtid%';",
         "GTID Variables"
     ],
+    "m6": [
+        "mdb",
+        "u",
+        "SHOW GLOBAL STATUS LIKE 'wsrep_cluster%'",
+        "Galera cluster status"
+    ],
     "l1": [
         "lin",
         "u",
