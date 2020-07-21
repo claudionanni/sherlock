@@ -188,12 +188,18 @@ parser.add_argument("-p","--password", metavar='<password>',default='',help='Pas
 parser.add_argument("-c","--commands", metavar='<command>,',nargs='*',help='It takes a comma separated list of commands')
 #parser.add_argument("-v","--verbose",action="store_true",help='Also prints the commands output on screen')
 parser.add_argument("-s","--screen",action="store_true",help='Show ouput of commands on screen, do not write to files')
+parser.add_argument("-i","--issue",metavar="<issue number>",default='99999',help='Tag file with issue number')
 args = parser.parse_args()
 
 timestampedFolder=''
 def createTimestampedFolder():
     timestampedFolder=datetime.now().strftime("%Y%m%d-%H%M%S")
-    path="shock-" + timestampedFolder
+    if(args.issue):
+        issue_number="i"+args.issue+"-"
+    else:
+        issue_numer=''
+
+    path=issue_number + "shock-" + timestampedFolder
     print("\nAll collected data will be placed in the folder: ",path," and zipped to ",path+".zip\n")
     try:
         os.mkdir(path)
