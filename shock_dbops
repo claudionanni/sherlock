@@ -15,10 +15,12 @@ import argparse
 print("\n\nSHERLOCK - Command Dumper ©2020 By Claudio The Nanni")
 
 parser = argparse.ArgumentParser(prog='shock',description='Dumps SHERLOCK commands from DB to JSON')
-parser.add_argument('--host', metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
-parser.add_argument('--port', metavar='<port>',default='3306',help='Port the MariaDB instance')
-parser.add_argument('--user', metavar='<user>',default='root',help='User of the MariaDB instance')
-parser.add_argument('--password', metavar='<password>',default='',help='Password of the MariaDB instance')
+parser.add_argument('-H','--host', metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
+parser.add_argument('-P','--port', metavar='<port>',default='3306',help='Port the MariaDB instance')
+parser.add_argument('-u','--user', metavar='<user>',default='root',help='User of the MariaDB instance')
+parser.add_argument('-p','--password', metavar='<password>',default='',help='Password of the MariaDB instance')
+parser.add_argument('-e','--export', action='store_true',default='',help='Export commands to the json commands file')
+parser.add_argument('-a','--add-command', metavar='<command row>',default='',help='Add one command in the format: cmd_id,cmd_type,cmd_usertype,cmd_text,cmd_description,cmd_status')
 args = parser.parse_args()
 
 
@@ -39,11 +41,12 @@ def dump_commands_from_db():
       sys.exit(1)
    cur = conn.cursor();
    print("Loading commands...")
-   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
+   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION FROM sherlock_cmd s LEFT join commands_validation c ON s.id=c.cmdid  WHERE c.status='VALID' ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
    for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION) in cur:
-      listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
+        listCommands[ID]=[TYPE,USER_TYPE,COMMAND,DESCRIPTION]
    print("Writing commands to json file...")
    with open('./sherlock_cmd.json', 'w') as fp:
-      json.dump(listCommands, fp,indent=4)
+       json.dump(listCommands, fp,indent=4)
 
-dump_commands_from_db()
+if(args.export):
+    dump_commands_from_db()

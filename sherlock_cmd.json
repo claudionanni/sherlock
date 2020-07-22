@@ -124,5 +124,11 @@
         "u",
         "ps -ef | egrep -i \"maria|mysql|galera|percona|sst\"",
         "Check relevant processes"
+    ],
+    "x1": [
+        "a",
+        "a",
+        "a",
+        "a"
     ]
 }
