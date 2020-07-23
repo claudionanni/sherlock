@@ -20,7 +20,7 @@ parser.add_argument('-P','--port', metavar='<port>',default='3306',help='Port th
 parser.add_argument('-u','--user', metavar='<user>',default='root',help='User of the MariaDB instance')
 parser.add_argument('-p','--password', metavar='<password>',default='',help='Password of the MariaDB instance')
 parser.add_argument('-e','--export', action='store_true',default='',help='Export commands to the json commands file')
-parser.add_argument('-a','--add-command', metavar='<command row>',default='',help='Add one command in the format: cmd_id,cmd_type,cmd_usertype,cmd_text,cmd_description,cmd_status')
+parser.add_argument('-a','--add', metavar='<command row>',default='',help='Add one command in the format: cmd_id,cmd_type,cmd_usertype,cmd_text,cmd_description')
 args = parser.parse_args()
 
 
@@ -48,5 +48,25 @@ def dump_commands_from_db():
    with open('./sherlock_cmd.json', 'w') as fp:
        json.dump(listCommands, fp,indent=4)
 
+
 if(args.export):
     dump_commands_from_db()
+
+if(args.add):
+    print("add command"+args.add)
+    print("INSERT INTO ..... STATUS='REVIEW'")
+    try:
+        conn = mariadb.connect(
+        user=args.user,
+        password=args.password,
+        host=args.host,
+        database="sherlock",
+        port=int(args.port))
+    except mariadb.Error as e:
+        print(f"Error connecting to MariaDB Platform: {e}")
+        sys.exit(1)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO sherlock_cmd VALUES("+args.add+")")
+    print("Command added")
+
+
