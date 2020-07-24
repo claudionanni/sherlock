@@ -10,20 +10,46 @@ import time
 import json
 import requests
 from datetime import datetime
+from prettytable import PrettyTable
 import argparse
 
 print("\n\nSHERLOCK - Command Dumper ©2020 By Claudio The Nanni")
 
-parser = argparse.ArgumentParser(prog='shock',description='Dumps SHERLOCK commands from DB to JSON')
+print("\n\nAnyone can add/submit a new command, only users with privileges on 'commands_validation' table can Validate commands.\n")
+
+parser = argparse.ArgumentParser(prog='shock',description='Provides administrative tasks on Commands table')
 parser.add_argument('-H','--host', metavar='<hostname or ip>',default='127.0.0.1',help='Hostname or ip of the MariaDB instance')
 parser.add_argument('-P','--port', metavar='<port>',default='3306',help='Port the MariaDB instance')
 parser.add_argument('-u','--user', metavar='<user>',default='root',help='User of the MariaDB instance')
 parser.add_argument('-p','--password', metavar='<password>',default='',help='Password of the MariaDB instance')
 parser.add_argument('-e','--export', action='store_true',default='',help='Export commands to the json commands file')
-parser.add_argument('-a','--add', metavar='<command row>',default='',help='Add one command in the format: cmd_id,cmd_type,cmd_usertype,cmd_text,cmd_description')
+parser.add_argument('-a','--add', metavar='<command row>',default='',help='Add one command in the format: "\'id\',\'type\',\'user_type\',\'command\',\'description\'"')
+parser.add_argument('-v','--validate', metavar='<command id>',default='',help='Validate one command by id')
+parser.add_argument('-U','--unvalidate', metavar='<command id>',default='',help='Unvalidate one command by id')
+parser.add_argument('-l','--list', action='store_true',default='',help='List commands summary')
+parser.add_argument('-s','--show', metavar='<command id>',default='',help='Show the complete command code by id')
+
 args = parser.parse_args()
 
-
+def list_commands():
+   ## PTable module needed: sudo pip3 install PTable
+   try:
+      conn = mariadb.connect(
+      user=args.user,
+      password=args.password,
+      host=args.host,
+      database="sherlock",
+      port=int(args.port))
+   except mariadb.Error as e:
+      print(f"Error connecting to MariaDB Platform: {e}")
+      sys.exit(1)
+   x = PrettyTable()
+   x.field_names = ["Cmd Id", "Type", "User Type", "Description","Status"]
+   cur = conn.cursor();
+   cur.execute("SELECT ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION,c.status FROM sherlock_cmd s LEFT join commands_validation c ON s.id=c.cmdid   ORDER BY type desc,cast(substring(ID,2) as unsigned)" )
+   for (ID,TYPE,USER_TYPE,COMMAND,DESCRIPTION,status) in cur:
+       x.add_row([ID,TYPE,USER_TYPE,DESCRIPTION,status])
+   print(x)
 
 def dump_commands_from_db():
    # For database management of commands, periodically they can be exported from the database (if mantained there) and dumped to json file that should be then uploaded to github
@@ -69,4 +95,5 @@ if(args.add):
     cur.execute("INSERT INTO sherlock_cmd VALUES("+args.add+")")
     print("Command added")
 
-
+if(args.list):
+    list_commands()
