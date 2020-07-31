@@ -95,5 +95,37 @@ if(args.add):
     cur.execute("INSERT INTO sherlock_cmd VALUES("+args.add+")")
     print("Command added")
 
+if(args.validate):
+    try:
+        conn = mariadb.connect(
+        user=args.user,
+        password=args.password,
+        host=args.host,
+        database="sherlock",
+        port=int(args.port))
+    except mariadb.Error as e:
+        print(f"Error connecting to MariaDB Platform: {e}")
+        sys.exit(1)
+    cur = conn.cursor()
+    cur.execute("UPDATE commands_validation SET STATUS='VALID' WHERE cmdid='"+args.validate+"'")
+    print("Command Validated")
+
+
+if(args.unvalidate):
+    try:
+        conn = mariadb.connect(
+        user=args.user,
+        password=args.password,
+        host=args.host,
+        database="sherlock",
+        port=int(args.port))
+    except mariadb.Error as e:
+        print(f"Error connecting to MariaDB Platform: {e}")
+        sys.exit(1)
+    cur = conn.cursor()
+    cur.execute("UPDATE commands_validation SET STATUS='NOT_VALID' WHERE cmdid='"+args.validate+"'")
+    print("Command Validated")
+
+
 if(args.list):
     list_commands()
